@@ -10,17 +10,12 @@
 package HW1108;
 
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class HW1108 {
 
-    private static final int seed = 97;
-
     public static void main(String[] args){
-        int min = 10, max = 50, size = 20;
-
-        int[] inputArray = makeInput(min, max, size);
-
-        int table[] = hashTable(8, inputArray);
+        int[] table = hashTable(8, makeInput());
 
         System.out.println("index\tdata value");
 
@@ -32,50 +27,34 @@ public class HW1108 {
 
     private static int[] hashTable(int tableSize, int[] input){
         int[] table = new int[tableSize];
-        int index, count = 0;
+        int index;
+        double count = 0;
 
         for(int key : input){
             index = key % table.length;
 
-            if(table[index] == 0)
-                table[index] = key;
-            else{
-                int bump = 1;
-                while (table[index + bump] != 0){
-                    bump++;
-                }
-                table[index + bump] = key;
-            }
+            while(table[index] !=0)
+                index++;
 
-            count++;
-            if ((double) count / (double) tableSize >= .75){
+            table[index] = key;
+
+            if(++count/tableSize >= .75)
                 return hashTable(tableSize * 2, input);
-            }
         }
-
         return table;
     }
 
-    private static int[] makeInput(int poolMin, int poolMax, int arrLen){
-        int poolSize = poolMax - poolMin + 1;
-        Random rand = new Random(seed);
-
-        int[] inputPool = new int[poolSize];
-        int[] arr = new int[arrLen];
-
-        for(int x = 0; x < inputPool.length; x++){
-            inputPool[x] = x + poolMin;
-        }
-
-        int max = inputPool.length - 1;
+    private static int[] makeInput(){
+        int[] inputPool = IntStream.rangeClosed(10,50).toArray(), arr = new int[20];
+        int index, max = inputPool.length - 1;
+        Random rand = new Random(97);
 
         for(int x = 0; x < arr.length; x++){
-            int i = rand.nextInt(max);
-            arr[x] = inputPool[i];
-            inputPool[i] = inputPool[max];
+            index = rand.nextInt(max);
+            arr[x] = inputPool[index];
+            inputPool[index] = inputPool[max];
             max--;
         }
-
         return arr;
     }
 }
